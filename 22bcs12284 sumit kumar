@@ -1,0 +1,149 @@
+import java.io.*;
+
+// Student class implementing Serializable
+class Student implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private int id;
+    private String name;
+    private double gpa;
+
+    public Student(int id, String name, double gpa) {
+        this.id = id;
+        this.name = name;
+        this.gpa = gpa;
+    }
+
+    public void display() {
+        System.out.println("Student ID: " + id);
+        System.out.println("Name: " + name);
+        System.out.println("GPA: " + gpa);
+    }
+}
+
+public class StudentSerialization {
+    private static final String FILE_NAME = "student.ser";
+
+    // Serialize Student object
+    public static void serializeStudent(Student student) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
+            oos.writeObject(student);
+            System.out.println("Student object serialized successfully.");
+        } catch (IOException e) {
+            System.out.println("Error during serialization: " + e.getMessage());
+        }
+    }
+
+    // Deserialize Student object
+    public static void deserializeStudent() {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
+            Student student = (Student) ois.readObject();
+            System.out.println("Deserialized Student Details:");
+            student.display();
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found. Please serialize first.");
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Error during deserialization: " + e.getMessage());
+        }
+    }
+
+    public static void main(String[] args) {
+        Student student = new Student(101, "John Doe", 3.9);
+        serializeStudent(student);   // Serialize student object
+        deserializeStudent();        // Deserialize and display details
+    }
+}
+
+
+import java.io.*;
+import java.util.Scanner;
+
+// Employee class implementing Serializable
+class Employee implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private int empId;
+    private String name;
+    private String designation;
+    private double salary;
+
+    public Employee(int empId, String name, String designation, double salary) {
+        this.empId = empId;
+        this.name = name;
+        this.designation = designation;
+        this.salary = salary;
+    }
+
+    @Override
+    public String toString() {
+        return "Employee ID: " + empId + ", Name: " + name + ", Designation: " + designation + ", Salary: " + salary;
+    }
+}
+
+public class EmployeeManagement {
+    private static final String FILE_NAME = "employees.dat";
+    private static Scanner scanner = new Scanner(System.in);
+
+    // Add employee and save to file
+    public static void addEmployee() {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_NAME, true))) {
+            System.out.print("Enter Employee ID: ");
+            int empId = scanner.nextInt();
+            scanner.nextLine();  // Consume newline
+            System.out.print("Enter Name: ");
+            String name = scanner.nextLine();
+            System.out.print("Enter Designation: ");
+            String designation = scanner.nextLine();
+            System.out.print("Enter Salary: ");
+            double salary = scanner.nextDouble();
+
+            Employee emp = new Employee(empId, name, designation, salary);
+            oos.writeObject(emp);
+            System.out.println("Employee added successfully.\n");
+
+        } catch (IOException e) {
+            System.out.println("Error saving employee: " + e.getMessage());
+        }
+    }
+
+    // Display all employees from file
+    public static void displayEmployees() {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
+            System.out.println("\nEmployee List:");
+            while (true) {
+                Employee emp = (Employee) ois.readObject();
+                System.out.println(emp);
+            }
+        } catch (EOFException e) {
+            // End of file reached, normal exit
+        } catch (FileNotFoundException e) {
+            System.out.println("No employees found. Please add employees first.");
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Error reading employees: " + e.getMessage());
+        }
+    }
+
+    public static void main(String[] args) {
+        while (true) {
+            System.out.println("\nEmployee Management System");
+            System.out.println("1. Add Employee");
+            System.out.println("2. Display All Employees");
+            System.out.println("3. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    addEmployee();
+                    break;
+                case 2:
+                    displayEmployees();
+                    break;
+                case 3:
+                    System.out.println("Exiting application...");
+                    System.exit(0);
+                    break;
+                default:
+                    System.out.println("Invalid choice! Please try again.");
+            }
+        }
+    }
+}
